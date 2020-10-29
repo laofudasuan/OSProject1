@@ -80,14 +80,45 @@ public class Communicator {
     // my code end
 
     // my test code begin
-    public static void testCommunicator()
+    public static void testCommunicator1()
+    {
+        final Communicator comm = new Communicator();
+
+        KThread speakThread = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** speakThread in testOfCommunicator1 run!");
+                    comm.speak(1);
+                }
+            }
+        );
+        speakThread.fork();
+
+        final int wordGet[] = new int[2];
+        KThread listenThread = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** listenThread in testOfCommunicator1 run!");
+                    wordGet[0] = comm.listen();
+                }
+            }
+        );
+        listenThread.fork();
+
+        speakThread.join();
+        listenThread.join();
+
+        Lib.assertTrue((wordGet[0]==1), " Communicate 1.");
+    }
+
+    public static void testCommunicator2()
     {
         final Communicator comm = new Communicator();
 
         KThread speakThread1 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** speakThread1 in testOfCommunicator run!");
+                    System.out.println("*** speakThread1 in testOfCommunicator2 run!");
                     comm.speak(100);
                 }
             }
@@ -97,7 +128,7 @@ public class Communicator {
         KThread speakThread2 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** speakThread2 in testOfCommunicator run!");
+                    System.out.println("*** speakThread2 in testOfCommunicator2 run!");
                     comm.speak(200);
                 }
             }
@@ -108,7 +139,7 @@ public class Communicator {
         KThread listenThread1 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** listenThread1 in testOfCommunicator run!");
+                    System.out.println("*** listenThread1 in testOfCommunicator2 run!");
                     wordGet[0] = comm.listen();
                 }
             }
@@ -119,7 +150,7 @@ public class Communicator {
         KThread listenThread2 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** listenThread2 in testOfCommunicator run!");
+                    System.out.println("*** listenThread2 in testOfCommunicator2 run!");
                     wordGet[1] = comm.listen();
                 }
             }
@@ -135,8 +166,68 @@ public class Communicator {
         Lib.assertTrue((wordGet[1]==200), " Communicate 200 .");
     }
 
+    public static void testCommunicator3()
+    {
+        final Communicator comm = new Communicator();
+
+        KThread speakThread1 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** speakThread1 in testOfCommunicator3 run!");
+                    comm.speak(500);
+                }
+            }
+        );
+
+        KThread speakThread2 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** speakThread2 in testOfCommunicator3 run!");
+                    comm.speak(600);
+                }
+            }
+        );
+
+        final int wordGet[] = new int[2];
+        KThread listenThread1 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** listenThread1 in testOfCommunicator3 run!");
+                    wordGet[0] = comm.listen();
+                }
+            }
+        );
+
+
+        final int wordGet2;
+        KThread listenThread2 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** listenThread2 in testOfCommunicator3 run!");
+                    wordGet[1] = comm.listen();
+                }
+            }
+        );
+
+        listenThread1.fork();
+        listenThread2.fork();
+        speakThread2.fork();
+        speakThread1.fork();
+
+        speakThread1.join();
+        speakThread2.join();
+        listenThread1.join();
+        listenThread2.join();
+
+        Lib.assertTrue((wordGet[0]==600), " Communicate 600 .");
+        Lib.assertTrue((wordGet[1]==500), " Communicate 500 .");
+    }
+
     public static void selfTest() {
-        testCommunicator();
+        System.out.println("\n Tests Of Communicator");
+        testCommunicator1();
+        testCommunicator2();
+        testCommunicator3();
     }
     // my test code end
 }

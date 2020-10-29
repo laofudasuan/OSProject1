@@ -459,15 +459,19 @@ public class KThread {
         new PingTest(0).run();
 
         // 加入对自己写的join的测试
-        testOfJoin();
+        System.out.println("\n Tests Of Thread Join");
+        testOfJoin1();
+        testOfJoin2();
     }
 
     // my test code begin
-    private static void testOfJoin() {
+    private static void testOfJoin1() {
+        System.out.println("*** test 1 of thread join!");
+
         KThread thread1 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** thread1 in testOfJoin run!");
+                    System.out.println("*** thread1 in testOfJoin1 run!");
                 }
             }
         );
@@ -476,7 +480,7 @@ public class KThread {
         KThread thread2 = new KThread(
             new Runnable() {
                 public void run() {
-                    System.out.println("*** thread2 in testOfJoin run!");
+                    System.out.println("*** thread2 in testOfJoin1 run!");
                     thread1.join();
                 }
             }
@@ -488,6 +492,43 @@ public class KThread {
         Lib.assertTrue((thread1.status == statusFinished), " thread1 should be finished.");
     }
 
+    private static void testOfJoin2() {
+        System.out.println("*** test 2 of thread join!");
+
+        KThread thread1 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** thread1 in testOfJoin2 run!");
+                }
+            }
+        );
+        thread1.fork();
+
+        KThread thread2 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** thread2 in testOfJoin2 run!");
+                    thread1.join();
+                }
+            }
+        );
+        thread2.fork();
+
+        KThread thread3 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** thread3 in testOfJoin2 run!");
+                    thread2.join();
+                }
+            }
+        );
+        thread3.fork();
+
+        thread3.join();
+
+        Lib.assertTrue((thread1.status == statusFinished), " thread1 should be finished.");
+        Lib.assertTrue((thread2.status == statusFinished), " thread2 should be finished.");
+    }
     // my test code end
 
     private static final char dbgThread = 't';

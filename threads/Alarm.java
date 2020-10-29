@@ -96,11 +96,30 @@ public class Alarm {
     
     // my test code begin
     public static void selfTest() {
-        System.out.println("test Of Alarm run");
+        System.out.println("\n Tests Of Alarm");
         long timeStart = Machine.timer().getTime();
         ThreadedKernel.alarm.waitUntil(10);
         long timeEnd = Machine.timer().getTime();
+        System.out.println(timeEnd-timeStart);
         Lib.assertTrue((timeEnd-timeStart>=10), " Alarm test 10.");
+
+        timeStart = Machine.timer().getTime();
+        ThreadedKernel.alarm.waitUntil(500);
+        timeEnd = Machine.timer().getTime();
+        System.out.println(timeEnd-timeStart);
+        Lib.assertTrue((timeEnd-timeStart>=500), " Alarm test 500.");
+
+        timeStart = Machine.timer().getTime();
+        ThreadedKernel.alarm.waitUntil(0);
+        timeEnd = Machine.timer().getTime();
+        System.out.println(timeEnd-timeStart);
+        Lib.assertTrue((timeEnd-timeStart>=0), " Alarm test 0.");
+
+        timeStart = Machine.timer().getTime();
+        ThreadedKernel.alarm.waitUntil(-500);
+        timeEnd = Machine.timer().getTime();
+        System.out.println(timeEnd-timeStart);
+        Lib.assertTrue((timeEnd-timeStart>=0), " Alarm test -500.");
     }
     // my test code end
 
