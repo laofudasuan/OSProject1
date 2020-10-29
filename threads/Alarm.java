@@ -2,7 +2,8 @@ package nachos.threads;
 
 import nachos.machine.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
@@ -19,7 +20,7 @@ public class Alarm {
     public Alarm() {
 
         // my code begin
-        waitingThreadMap = new HashMap<KThread, long>();
+        waitingThreadMap = new HashMap<KThread, Long>();
         // my code end
 
         Machine.timer().setInterruptHandler(new Runnable() {
@@ -39,13 +40,13 @@ public class Alarm {
         long currTime = Machine.timer().getTime();
 
         // my code begin
-        Iterator mapIterator = waitingThreadMap.entrySet().Iterator();
-        Map.Entry<KThread, long> mapItem;
+        Iterator mapIterator = waitingThreadMap.entrySet().iterator();
+        HashMap.Entry<KThread, Long> mapItem;
         KThread thread;
         long wakeTime;
         while(mapIterator.hasNext())
         {
-            mapItem = (Map.Entry<KThread, long>) mapIterator.next();
+            mapItem = (HashMap.Entry<KThread, Long>) mapIterator.next();
             thread = mapItem.getKey();
             wakeTime = waitingThreadMap.get(thread);
             if (wakeTime <= currTime)
@@ -89,7 +90,18 @@ public class Alarm {
     }
 
     // my code begin
-    private HashMap<KThread, long> waitingThreadMap;
+    private HashMap<KThread, Long> waitingThreadMap;
     // my code end
+
+    
+    // my test code begin
+    public static void selfTest() {
+        System.out.println("test Of Alarm run");
+        long timeStart = Machine.timer().getTime();
+        ThreadedKernel.alarm.waitUntil(10);
+        long timeEnd = Machine.timer().getTime();
+        Lib.assertTrue((timeEnd-timeStart>=10), " Alarm test 10.");
+    }
+    // my test code end
 
 }

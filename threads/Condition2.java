@@ -39,7 +39,7 @@ public class Condition2 {
         // my-code-begin
         boolean status = Machine.interrupt().disable();
         conditionLock.release();
-        waitqueue.waitForAccess(KThread.currentThread());
+        waitQueue.waitForAccess(KThread.currentThread());
         KThread.currentThread().sleep();
         conditionLock.acquire();
         Machine.interrupt().restore(status);
@@ -55,7 +55,7 @@ public class Condition2 {
 
         // my-code-begin
         boolean status = Machine.interrupt().disable();
-        KThread thread = waitqueue.nextThread();
+        KThread thread = waitQueue.nextThread();
         if (!(thread==null)){
             thread.ready();
         }
@@ -72,10 +72,10 @@ public class Condition2 {
     
         // my-code-begin
         boolean status = Machine.interrupt().disable();
-        KThread thread = waitqueue.nextThread();
+        KThread thread = waitQueue.nextThread();
         while (!(thread==null)){
             thread.ready();
-            thread = waitqueue.nextThread();
+            thread = waitQueue.nextThread();
         }
         Machine.interrupt().restore(status);
         // my-code-end
@@ -85,4 +85,61 @@ public class Condition2 {
     // my-code-begin
     private ThreadQueue waitQueue;
     // my-code-end
+
+    // my test code begin
+    private static class TestCondition2
+    {
+        private static Lock tLock;
+        private static Condition2 tCondition2;
+
+        public TestCondition2(){
+            tLock = new Lock();
+            tCondition2 = new Condition2(tLock);
+
+            KThread thread1 = new KThread(
+                new Runnable() {
+                    public void run() {
+                        System.out.println("*** thread1 in testOfCondition2 run!");
+                        tLock.acquire();
+                        for (int i=0; i<10; i++) {
+                            String currentThreadName = KThread.currentThread().getName();
+                            System.out.println("current thread is: "+currentThreadName);
+                            tCondition2.wake();
+                            tCondition2.sleep();
+                        }
+                        tLock.release();
+                    }
+                }
+            );
+            thread1.setName("thread1 in testOfCondition2");
+            thread1.fork();
+
+            KThread thread2 = new KThread(
+                new Runnable() {
+                    public void run() {
+                        System.out.println("*** thread2 in testOfCondition2 run!");
+                        tLock.acquire();
+                        for (int i=0; i<10; i++) {
+                            String currentThreadName = KThread.currentThread().getName();
+                            System.out.println("current thread is: "+currentThreadName);
+                            tCondition2.wake();
+                            tCondition2.sleep();
+                        }
+                        tLock.release();
+                    }
+                }
+            );
+            thread2.setName("thread2 in testOfCondition2");
+            thread2.fork();
+
+            thread2.join();
+        }
+    }
+
+    // 和其它的自测放在一起
+    public static void selfTest() {
+        new TestCondition2();
+    }
+
+    // my test code end
 }

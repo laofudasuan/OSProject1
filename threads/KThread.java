@@ -304,15 +304,15 @@ public class KThread {
      */
     // my code begin
     private boolean joinFlag = false;
-    private ThreadQueue joinQueue = null;
+    private static ThreadQueue joinQueue = null;
     // my code end
     public void join() {
         Lib.debug(dbgThread, "Joining to thread: " + toString());
 
         Lib.assertTrue(this != currentThread);
-·
+
         // my-code-begin
-        if （statusFinished == this.status）
+        if (statusFinished == this.status)
         {
             return;
         }
@@ -457,7 +457,38 @@ public class KThread {
 
         new KThread(new PingTest(1)).setName("forked thread").fork();
         new PingTest(0).run();
+
+        // 加入对自己写的join的测试
+        testOfJoin();
     }
+
+    // my test code begin
+    private static void testOfJoin() {
+        KThread thread1 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** thread1 in testOfJoin run!");
+                }
+            }
+        );
+        thread1.fork();
+
+        KThread thread2 = new KThread(
+            new Runnable() {
+                public void run() {
+                    System.out.println("*** thread2 in testOfJoin run!");
+                    thread1.join();
+                }
+            }
+        );
+        thread2.fork();
+
+        thread2.join();
+
+        Lib.assertTrue((thread1.status == statusFinished), " thread1 should be finished.");
+    }
+
+    // my test code end
 
     private static final char dbgThread = 't';
 
